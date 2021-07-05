@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const Room = require('../models/Location');
+const Room = require('../models/Room');
 
 // create a middleware to check if the user is logged in
 const loginCheck = () => {

@@ -18,9 +18,10 @@ const loginCheck = () => {
 }
 
 router.get("/", (req, res, next) => {
+  const api_key = process.env.GOOGLEMAPS_KEY;
   console.log('----->>> User arriving at home: ' + req.user);
   Location.find()
-    .then((locations) => res.render('index', { locations, user: req.user, title: 'Home' }))
+    .then((locations) => res.render('index', { api_key, locations, user: req.user, title: 'Home' }))
     .catch((err) => next(err));
 });
 

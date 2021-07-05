@@ -1,16 +1,16 @@
 <h2>{{title}}</h2>
 
-<div id="rooms">
-  {{#each rooms}}
-  <div id="room">
+ <div class="locations">
+  {{#each location}}
+  <div class="location">
     <p>{{name}}</p>
-    <p>{{description}}</p>
-    <img src="{{imageUrl}}" alt="Image of room {{name}}" height="300">
-    <form action="/rooms/{{_id}}/edit" method="GET">
-      <button>Edit room</button>
+    <p>{{address}}</p>
+    <img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
+    <form action="/locations/{{_id}}/edit" method="GET">
+      <button>Edit location</button>
     </form>
-    <form action="/rooms/{{_id}}/delete" method="GET">
-      <button>Delete room</button>
+    <form action="/locations/{{_id}}/delete" method="GET">
+      <button>Delete location</button>
     </form>
   </div>
   {{/each}}

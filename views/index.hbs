@@ -1,10 +1,10 @@
 <h2>Home</h2>
 
-<div id="rooms">
-  {{#each rooms}}
-  <div id="room">
+<div class="location">
+  {{#each location}}
+  <div class="location">
     <p>{{name}}</p></a>
-    <p>{{description}}</p>
+    <p>{{address}}</p>
     <img src="{{imageUrl}}" alt="Image of room {{name}}" height="300">
   </div>
   {{/each}}

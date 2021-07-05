@@ -1,0 +1,17 @@
+<h2>{{title}}</h2>
+
+<div id="rooms">
+  {{#each rooms}}
+  <div id="room">
+    <p>{{name}}</p>
+    <p>{{description}}</p>
+    <img src="{{imageUrl}}" alt="Image of room {{name}}" height="300">
+    <form action="/rooms/{{_id}}/edit" method="GET">
+      <button>Edit room</button>
+    </form>
+    <form action="/rooms/{{_id}}/delete" method="GET">
+      <button>Delete room</button>
+    </form>
+  </div>
+  {{/each}}
+</div>

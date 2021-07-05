@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const locationSchema = new Schema({
     name: { type: String },
-    address: {type: String},
+    address: { type: String },
     imageUrl: { type: String },
     owner: { 
         type: Schema.Types.ObjectId,

@@ -8,7 +8,12 @@ const userSchema = new Schema({
   },
   password: String,
   githubId: String,
-  avatar: String
+  avatar: String,
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  }
 });
 
 const User = model("User", userSchema);

@@ -32,7 +32,7 @@ a {
   color: #00B7FF;
 }
 
-#rooms {
+.locations {
   display: flex;
   justify-content: space-around;
 }

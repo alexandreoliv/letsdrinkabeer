@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const Room = require('../models/Room');
+const Location = require('../models/Location');
 
 // create a middleware to check if the user is logged in
 const loginCheck = () => {
@@ -19,67 +19,72 @@ const loginCheck = () => {
 
 router.get("/", (req, res, next) => {
   console.log('----->>> User arriving at home: ' + req.user);
-  Room.find()
-    .then((rooms) => res.render('index', { rooms, user: req.user, title: 'Home' }))
+  Location.find()
+    .then((locations) => res.render('index', { locations, user: req.user, title: 'Home' }))
     .catch((err) => next(err));
 });
 
 // Our users can:
-// create new rooms only when logged in
-// edit and delete the rooms only if they created them (if they are the owners)
-// see the list of the rooms even though they are not logged in
+// create new locations only when logged in
+// edit and delete the location only if they created them (if they are the owners)
+// see the list of the locations even though they are not logged in
 // Please proceed to create all the routes and files necessary to display forms and see the results after the submission.
 
-router.post("/rooms", loginCheck(), (req, res, next) => {
-  console.log('----->>> POST /rooms called');
-  const { name, description, imageUrl } = req.body;
+router.post("/locations", loginCheck(), (req, res, next) => {
+  console.log('----->>> POST /locations called');
+  const { name, address, imageUrl } = req.body;
   const { _id } = req.user;
-  Room
+  Location
     .create ({
       name,
-      description,
+      address,
       imageUrl,
       owner: _id
     })
-    .then(() => res.redirect('/rooms'))
+    .then(() => res.redirect('/locations'))
     .catch((err) => next(err));
 });
 
-router.get('/rooms', loginCheck(), (req, res, next) => {
-  console.log('----->>> GET /rooms called');
+router.get('/locations', loginCheck(), (req, res, next) => {
+  console.log('----->>> GET /locations called');
   const { _id } = req.user;
-  Room.find({ owner: _id })
-    .then((myRooms) => res.render('rooms/index', { rooms: myRooms, title: 'My Rooms' }))
-    .catch((err) => next(err));
-});
-
-router.get('/rooms/new', loginCheck(), (req, res, next) => {
-  console.log('----->>> GET /rooms/new called');
-  res.render('rooms/new', { title: 'Add Room' })
-});
-
-router.get("/rooms/:id/edit", loginCheck(), (req, res, next) => {
-  console.log('----->>> GET /rooms/:id/edit called');
-    Room
-    .findById(req.params.id)
-    .then(room => {
-      if (JSON.stringify(room.owner) === JSON.stringify(req.user._id))
-        res.render('rooms/edit', { room, title: 'Edit room' })
+  Location.find({ owner: _id })
+    .then((myLocation) => {
+      res.render('locations/index', { location: myLocation, title: 'My Location' });
+      console.log('location is ', myLocation);
     })
     .catch((err) => next(err));
 });
 
-router.get("/rooms/:id/delete", (req, res, next) => {
-  console.log('----->>> POST /rooms/:id/delete called');
-  Room
+router.get('/locations/new', loginCheck(), (req, res, next) => {
+  console.log('----->>> GET /locations/new called');
+  res.render('locations/new', { title: 'Add Your Location' })
+});
+
+router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
+  console.log('----->>> GET /locations/:id/edit called');
+    Location
+    .findById(req.params.id)
+    .then(location => {
+      if (JSON.stringify(location.owner) === JSON.stringify(req.user._id)) {
+        console.log('location is ', location);
+        res.render('locations/edit', { location, title: 'Edit Location' })
+      }
+    })
+    .catch((err) => next(err));
+});
+
+router.get("/locations/:id/delete", (req, res, next) => {
+  console.log('----->>> POST /locations/:id/delete called');
+  Location
   .findById(req.params.id)
-  .then(room => {
-    if (JSON.stringify(room.owner) === JSON.stringify(req.user._id)) {
-      Room
+  .then(location => {
+    if (JSON.stringify(location.owner) === JSON.stringify(req.user._id)) {
+      Location
       .findByIdAndDelete(req.params.id)
-      .then(room => {
-        console.log('Room deleted');
-        res.redirect('/rooms');
+      .then(location => {
+        console.log('Location deleted:', location);
+        res.redirect('/locations');
       })
       .catch(err => {
         console.log(err)
@@ -89,17 +94,17 @@ router.get("/rooms/:id/delete", (req, res, next) => {
   .catch((err) => next(err));
 });
 
-router.post("/rooms/:id/edit", (req, res, next) => {
-  console.log('----->>> POST /rooms/:id/edit called');
-  const { name, description, imageUrl } = req.body;
-  Room.findByIdAndUpdate(req.params.id, {
+router.post("/locations/:id/edit", (req, res, next) => {
+  console.log('----->>> POST /locations/:id/edit called');
+  const { name, address, imageUrl } = req.body;
+  Location.findByIdAndUpdate(req.params.id, {
     name,
-    description,
+    address,
     imageUrl
   })
-	.then(room => {
-    console.log(`Successully edited ${room}`);
-    res.redirect('/rooms');
+	.then(location => {
+    console.log(`Successully edited ${location}`);
+    res.redirect('/locations');
 	})
 	.catch(err => {
 		console.log(err);

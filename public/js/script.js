@@ -19,6 +19,45 @@ function initMap() {
   });
   directionsRenderer.setMap(map);
 
+  var markers = [
+    {
+        "title": 'Andrew',
+        "lat": '52.48165332648858',
+        "lng": '13.430200542444746',
+    },
+    {
+        "title": 'John Flanders',
+        "lat": '52.50000624341336',
+        "lng": '13.407331065088137',
+    },
+    {
+        "title": 'Mario Calabaza',
+        "lat": '52.528425739135514',
+        "lng": '13.350475589437893',
+        // "description": 'Girgaum Beach commonly known as just Chaupati is one of the most famous public beaches in Mumbai.'
+    },
+    {
+        "title": 'Charlotte Helvetica',
+        "lat": '52.52283368313142',
+        "lng": '13.445304644505404',
+    },
+    {
+        "title": 'Carlos Danger',
+        "lat": '52.49915532949563',
+        "lng": '13.324879639545088',
+    }
+    ];
+
+    for (let i = 0; i < markers.length; i++) {
+      var data = markers[i]
+      var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+      var marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map,
+          title: data.title
+      });
+    }
+
   const firstRandomHome = new google.maps.Marker({
     position: {
       lat: 52.54236280866809,

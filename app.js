@@ -60,7 +60,6 @@ passport.deserializeUser((id, done) => {
 		})
 })
 
-
 // register the local strategy (login with username and password)
 
 passport.use(

@@ -3,8 +3,6 @@ body {
   margin: 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
 
-
-
 #body {
   padding: 50px;
 }
@@ -37,12 +35,14 @@ body {
   padding: 1rem;
   max-width: 20rem;
   height: 100%;
-  font-size: 0.6em;
+  font-size: 0.8em;
   font-weight: bold;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   overflow: auto;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 #map {
@@ -97,7 +97,6 @@ nav {
   background-color: #2081c3;
   border-bottom: 2px groove #bfbfbf;
 }
-
 
 nav a {
   text-decoration: none;
@@ -179,9 +178,9 @@ h3 {
   1.5em;
 }
 
-
-
-
+#bar {
+  padding: 5px 0;
+}
 
 /* Original CSS code for backup only:_ */
 /* Optional: Makes the sample page fill the window.

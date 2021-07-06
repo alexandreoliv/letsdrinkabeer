@@ -20,14 +20,30 @@ function initMap() {
   	const control = document.getElementById("floating-panel");
   	map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
 
-	axios
-		.get('http://127.0.0.1:3000/someUrl')
-	 	.then(response => {	console.log('alex is about to get really really happy: ', response.data.locations); });
+		axios
+		.get('http://127.0.0.1:3000/getlocations')
+	 	.then(response => {
+			console.log('Locations: ', response.data.locations);
 
+		const markers = response.data.locations;
 
-	// axios get request to get all the markers
+		for (let i = 0; i < markers.length; i++) {
+			var data = markers[i]
+			var myLatlng = new google.maps.LatLng(data.position.lat, data.position.lng);
+			var marker = new google.maps.Marker({
+				position: myLatlng,
+				map: map,
+				title: data.title,
+				icon: {                             
+					url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+				}
+			});
+			}	
+		 })
+		.catch(err => { console.log(err); })
 
-
+		// console.log('locs: ', locs)
+	
 	// axios.get(`localhost:3000/someUrl`)
 	// 	.then(response => {
 	// 		console.log(response.data[0]);
@@ -43,64 +59,64 @@ function initMap() {
 	// 	})
 
 
-  	var markers = [
-		{
-			"title": 'Andrew',
-			"lat": '52.48165332648858',
-			"lng": '13.430200542444746',
-		},
-		{
-			"title": 'John Flanders',
-			"lat": '52.50000624341336',
-			"lng": '13.407331065088137',
-		},
-		{
-			"title": 'Mario Calabaza',
-			"lat": '52.528425739135514',
-			"lng": '13.350475589437893',
-		},
-		{
-			"title": 'Charlotte Helvetica',
-			"lat": '52.52283368313142',
-			"lng": '13.445304644505404',
-		},
-		{
-			"title": 'Carlos Danger',
-			"lat": '52.49915532949563',
-			"lng": '13.324879639545088',
-		}
-    ];
+  	// var markers = [
+	// 	{
+	// 		"title": 'Andrew',
+	// 		"lat": '52.48165332648858',
+	// 		"lng": '13.430200542444746',
+	// 	},
+	// 	{
+	// 		"title": 'John Flanders',
+	// 		"lat": '52.50000624341336',
+	// 		"lng": '13.407331065088137',
+	// 	},
+	// 	{
+	// 		"title": 'Mario Calabaza',
+	// 		"lat": '52.528425739135514',
+	// 		"lng": '13.350475589437893',
+	// 	},
+	// 	{
+	// 		"title": 'Charlotte Helvetica',
+	// 		"lat": '52.52283368313142',
+	// 		"lng": '13.445304644505404',
+	// 	},
+	// 	{
+	// 		"title": 'Carlos Danger',
+	// 		"lat": '52.49915532949563',
+	// 		"lng": '13.324879639545088',
+	// 	}
+    // ];
 
-  	for (let i = 0; i < markers.length; i++) {
-		var data = markers[i]
-		var myLatlng = new google.maps.LatLng(data.lat, data.lng);
-		var marker = new google.maps.Marker({
-			position: myLatlng,
-			map: map,
-			title: data.title,
-			icon: {                             
-				url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-			}
-		});
-  	}
+  	// for (let i = 0; i < markers.length; i++) {
+	// 	var data = markers[i]
+	// 	var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+	// 	var marker = new google.maps.Marker({
+	// 		position: myLatlng,
+	// 		map: map,
+	// 		title: data.title,
+	// 		icon: {                             
+	// 			url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+	// 		}
+	// 	});
+  	// }
 
-  	const firstRandomHome = new google.maps.Marker({
-    	position: {
-      		lat: 52.54236280866809,
-      		lng: 13.3802352451393
-    	},
-    	map: map,
-    	title: "First random home"
-  	});
+  	// const firstRandomHome = new google.maps.Marker({
+    // 	position: {
+    //   		lat: 52.54236280866809,
+    //   		lng: 13.3802352451393
+    // 	},
+    // 	map: map,
+    // 	title: "First random home"
+  	// });
 
-  	const secondRandomHome = new google.maps.Marker({
-    	position: {
-      		lat: 52.52242249057365,
-      		lng: 13.357630834676086
-    	},
-    	map: map,
-    	title: "Second random home"
-  	});
+  	// const secondRandomHome = new google.maps.Marker({
+    // 	position: {
+    //   		lat: 52.52242249057365,
+    //   		lng: 13.357630834676086
+    // 	},
+    // 	map: map,
+    // 	title: "Second random home"
+  	// });
 
   	const onChangeHandler = function () {
     	calculateAndDisplayRoute(directionsService, directionsRenderer);

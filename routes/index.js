@@ -25,8 +25,8 @@ router.get("/", (req, res, next) => {
     .catch((err) => next(err));
 });
 
-router.get("/someUrl", (req, res, next) => {
-  console.log('----->>> User arriving at someUrl: ');
+router.get("/getlocations", (req, res, next) => {
+  console.log('----->>> GET /getlocations called: ');
   Location.find()
     .then((locations) => res.json({ locations }))
     .catch((err) => next(err));
@@ -66,6 +66,19 @@ router.get('/locations', loginCheck(), (req, res, next) => {
       console.log('location is ', myLocation);
     })
     .catch((err) => next(err));
+});
+
+router.get('/admin', loginCheck(), (req, res, next) => {
+  console.log('----->>> GET /admin called');
+  const api_key = process.env.GOOGLEMAPS_KEY;
+    Location.find()
+      .then((locations) => {
+        if (req.user.role === 'admin')
+          res.render('locations/admin', { locations, user: req.user, admin: req.user, title: 'All Locations' });
+        else
+          res.render('index', { api_key, locations, user: req.user, title: 'Home' })
+      })
+      .catch((err) => next(err));
 });
 
 router.get('/locations/new', loginCheck(), (req, res, next) => {

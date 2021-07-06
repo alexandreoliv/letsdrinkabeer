@@ -17,11 +17,22 @@ const loginCheck = () => {
   }
 }
 
+// getGeoLocation()
+
 router.get("/", (req, res, next) => {
   const api_key = process.env.GOOGLEMAPS_KEY;
   console.log('----->>> User arriving at home: ' + req.user);
   Location.find()
-    .then((locations) => res.render('index', { api_key, locations, user: req.user, title: 'Home' }))
+    .then((locations) => {
+      if (req.user) {
+        if (req.user.role === 'admin')
+        res.render('index', { api_key, locations, user: req.user, admin: req.user, title: 'Home' });
+        else
+        res.render('index', { api_key, locations, user: req.user, title: 'Home' });
+      }
+      else
+        res.render('index', { api_key, locations, user: req.user, title: 'Home' });
+    })
     .catch((err) => next(err));
 });
 
@@ -38,6 +49,8 @@ router.get("/getlocations", (req, res, next) => {
 // see the list of the locations even though they are not logged in
 // Please proceed to create all the routes and files necessary to display forms and see the results after the submission.
 
+
+//call getGeo inside this function to get position:
 router.post("/locations", loginCheck(), (req, res, next) => {
   console.log('----->>> POST /locations called');
   const { name, address, imageUrl, lat, lng } = req.body;
@@ -62,8 +75,11 @@ router.get('/locations', loginCheck(), (req, res, next) => {
   const { _id } = req.user;
   Location.find({ owner: _id })
     .then((myLocation) => {
-      res.render('locations/index', { location: myLocation, user: req.user, title: 'My Location' });
-      console.log('location is ', myLocation);
+      if (req.user.role === 'admin')
+        res.render('locations/index', { location: myLocation, admin: req.user, user: req.user, title: 'My Location' });
+      else
+        res.render('locations/index', { location: myLocation, user: req.user, title: 'My Location' });
+        //console.log('location is ', myLocation);
     })
     .catch((err) => next(err));
 });
@@ -74,7 +90,7 @@ router.get('/admin', loginCheck(), (req, res, next) => {
     Location.find()
       .then((locations) => {
         if (req.user.role === 'admin')
-          res.render('locations/admin', { locations, user: req.user, admin: req.user, title: 'All Locations' });
+          res.render('locations/admin', { locations, admin: req.user, user: req.user, title: 'All Locations' });
         else
           res.render('index', { api_key, locations, user: req.user, title: 'Home' })
       })
@@ -83,7 +99,10 @@ router.get('/admin', loginCheck(), (req, res, next) => {
 
 router.get('/locations/new', loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations/new called');
-  res.render('locations/new', { user: req.user, title: 'Add Your Location' })
+  if (req.user.role === 'admin')
+    res.render('locations/new', { admin: req.user, user: req.user, title: 'Add Your Location' });
+  else
+    res.render('locations/new', { user: req.user, title: 'Add Your Location' })
 });
 
 router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
@@ -91,9 +110,9 @@ router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
     Location
     .findById(req.params.id)
     .then(location => {
-      if (JSON.stringify(location.owner) === JSON.stringify(req.user._id)) {
+      if (JSON.stringify(location.owner) === JSON.stringify(req.user._id) || req.user.role === 'admin') {
         console.log('location is ', location);
-        res.render('locations/edit', { location, user: req.user, title: 'Edit Location' })
+        res.render('locations/edit', { location, admin: req.user, user: req.user, title: 'Edit Location' })
       }
     })
     .catch((err) => next(err));

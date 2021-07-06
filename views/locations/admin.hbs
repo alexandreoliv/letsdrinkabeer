@@ -1,18 +1,18 @@
-<h2>{{title}}</h2>
+<h2 class="title">{{title}}</h2>
 
  <div class="locations">
 	{{#each locations}}
   		<div class="location">
-			<p>Name: {{name}}</p>
-			<p>Address: {{address}}</p>
+			<h3>{{name}}</h3>
+			<img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
+			<p>{{address}}</p>
 			<p>Latitude: {{position.lat}}</p>
 			<p>Longitude: {{position.lng}}</p>
-			<img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
 			<form action="/locations/{{_id}}/edit" method="GET">
-				<button>Edit location</button>
+				<button>Edit Location</button>
 			</form>
 			<form action="/locations/{{_id}}/delete" method="GET">
-				<button>Delete location</button>
+				<button>Delete Location</button>
 			</form>
   		</div>
 	{{/each}}

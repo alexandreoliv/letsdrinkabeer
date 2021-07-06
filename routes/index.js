@@ -25,6 +25,13 @@ router.get("/", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+router.get("/someUrl", (req, res, next) => {
+  console.log('----->>> User arriving at someUrl: ');
+  Location.find()
+    .then((locations) => res.json({ locations }))
+    .catch((err) => next(err));
+});
+
 // Our users can:
 // create new locations only when logged in
 // edit and delete the location only if they created them (if they are the owners)
@@ -55,7 +62,7 @@ router.get('/locations', loginCheck(), (req, res, next) => {
   const { _id } = req.user;
   Location.find({ owner: _id })
     .then((myLocation) => {
-      res.render('locations/index', { location: myLocation, title: 'My Location' });
+      res.render('locations/index', { location: myLocation, user: req.user, title: 'My Location' });
       console.log('location is ', myLocation);
     })
     .catch((err) => next(err));
@@ -63,7 +70,7 @@ router.get('/locations', loginCheck(), (req, res, next) => {
 
 router.get('/locations/new', loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations/new called');
-  res.render('locations/new', { title: 'Add Your Location' })
+  res.render('locations/new', { user: req.user, title: 'Add Your Location' })
 });
 
 router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
@@ -73,7 +80,7 @@ router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
     .then(location => {
       if (JSON.stringify(location.owner) === JSON.stringify(req.user._id)) {
         console.log('location is ', location);
-        res.render('locations/edit', { location, title: 'Edit Location' })
+        res.render('locations/edit', { location, user: req.user, title: 'Edit Location' })
       }
     })
     .catch((err) => next(err));

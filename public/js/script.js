@@ -16,9 +16,32 @@ function initMap() {
     	center: { lat: 52.520008, lng: 13.404954 },
   	});
   	directionsRenderer.setMap(map);
-  	// directionsRenderer.setPanel(document.getElementById("sidebar"));
+  	directionsRenderer.setPanel(document.getElementById("sidebar"));
   	const control = document.getElementById("floating-panel");
   	map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
+
+	axios
+		.get('http://127.0.0.1:3000/someUrl')
+	 	.then(response => {	console.log('alex is about to get really really happy: ', response.data.locations); });
+
+
+	// axios get request to get all the markers
+
+
+	// axios.get(`localhost:3000/someUrl`)
+	// 	.then(response => {
+	// 		console.log(response.data[0]);
+	// 		const countryDetails = response.data[0];
+	// 		// we update the dom with the data from the api
+	// 		document.querySelector('#country-name').innerText = countryDetails.name;
+	// 		document.querySelector('#country-population').innerText = countryDetails.population;
+	// 		document.querySelector('#country-flag').setAttribute('src', countryDetails.flag);
+
+	// 	})
+	// 	.catch(err => {
+	// 		console.log(err);
+	// 	})
+
 
   	var markers = [
 		{

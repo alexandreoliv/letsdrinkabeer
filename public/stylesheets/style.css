@@ -112,6 +112,12 @@ body {
   padding: 0.5rem;
 }
 
+#nav-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 
 /* Original CSS code for backup only:_ */
 /* Optional: Makes the sample page fill the window.

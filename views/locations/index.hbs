@@ -1,10 +1,12 @@
-<h2>{{title}}</h2>
+{{#with user}}
+<h2 class="title">Locations for {{username}}</h2>
+{{/with}}
 
  <div class="locations">
 	{{#each location}}
   		<div class="location">
-			<p>Name: {{name}}</p>
-			<p>Address: {{address}}</p>
+			<h3>{{name}}</h3>
+			<p>{{address}}</p>
 			<p>Latitude: {{position.lat}}</p>
 			<p>Longitude: {{position.lng}}</p>
 			<img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
@@ -17,3 +19,4 @@
   		</div>
 	{{/each}}
 </div>
+

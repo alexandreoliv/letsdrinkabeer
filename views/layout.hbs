@@ -9,13 +9,25 @@
 </head>
 <body>
   <nav>
-    <div>
-      <a href="/">Home</a>
-      <a href="/login">Log in</a>
-      <a href="/logout">Log out</a>
-      <a href="/private">Private</a>
-      <a href="/locations">Your Location</a>
-      <a href="/locations/new">Add Location</a>
+    <div id="nav-menu">
+      {{#if user}}
+        <div id="home-user">
+          <a href="/">Home</a>
+          <a href="/locations">{{user.username}}'s locations</a>
+          <a href="/locations/new">Add Location</a>
+        </div>
+        <div id="login-logout">
+          <a href="/logout">Log out</a>
+        </div>
+      {{else}}
+        <div id="home-user">
+          <a href="/">Home</a>
+        </div>
+        <div id="login-logout">
+          <a href="/login">Log in</a>
+        </div>
+      {{/if}}
+      {{!-- <a href="/locations">Your Location</a> --}}
     </div>
   </nav>
   

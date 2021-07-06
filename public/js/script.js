@@ -20,109 +20,234 @@ function initMap() {
   	const control = document.getElementById("floating-panel");
   	map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
 
-		axios
+	axios
 		.get('http://127.0.0.1:3000/getlocations')
-	 	.then(response => {
-			console.log('Locations: ', response.data.locations);
+		.then(response => {
+			// console.log('Locations: ', response.data.locations);
 
-		const markers = response.data.locations;
+			// creates all the markers on the map
+			const locations = response.data.locations;
+			for (let i = 0; i < locations.length; i++) {
+				let data = locations[i]
+				let myLatlng = new google.maps.LatLng(data.position.lat, data.position.lng);
+				let marker = new google.maps.Marker({
+					position: myLatlng,
+					map: map,
+					title: data.name,
+					icon: {                             
+						url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+					}
+				});
+			}	
 
-		for (let i = 0; i < markers.length; i++) {
-			var data = markers[i]
-			var myLatlng = new google.maps.LatLng(data.position.lat, data.position.lng);
-			var marker = new google.maps.Marker({
-				position: myLatlng,
+			let latArray = [];
+			let lngArray = [];
+			let distancesY = [];
+			let distancesX = [];
+			let latSum = 0;
+			let lngSum = 0;
+			let latAvg;
+			let lngAvg;
+			let distanceTotal = [];
+			let mean = 0;
+			let stdDev = 0;
+			let locationsNew = [ ];
+
+			function getCenter(arr) {
+					latSum = 0;
+					latArray = [ ];
+					lngSum = 0;
+					lngArray = [ ];
+				for (let location of arr) {
+					//console.log(location.position.lat);
+					latSum += location.position.lat;
+					latArray.push(location.position.lat);
+					lngSum += location.position.lng;
+					lngArray.push(location.position.lng);
+				}
+				latAvg = latSum / arr.length;
+				lngAvg = lngSum / arr.length;
+				center = [latAvg, lngAvg];
+				return center;
+			}
+
+			function getDistancesFromCenter(arr) {
+				distancesY = [];
+				distancesX = [];
+				distanceTotal = [];
+
+				for (let lat of latArray)
+					distancesY.push(Math.abs(latAvg - lat));
+				for (let lng of lngArray)
+					distancesX.push(Math.abs(lngAvg - lng));
+				for (let i = 0; i < arr.length; i++)
+					distanceTotal.push(Math.sqrt(distancesX[i]**2 + distancesY[i]**2))
+				
+				console.log('distanceTotal: ', distanceTotal);
+				const n = distanceTotal.length;
+				mean = distanceTotal.reduce((a, b) => a + b) / n;
+				stdDev = Math.sqrt(distanceTotal.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+				console.log('stdDev: ', stdDev);
+				console.log('mean: ', mean);
+			}
+
+			function getFinalCenter() {
+				locationsNew = [ ];
+				console.log('locations: ', locations)
+				for (let i = 0; i < locations.length; i++)
+					if (Math.abs(distanceTotal[i] - mean) <= stdDev) // if distance from this location to the potencial center is less than (2 * standard deviation), keep the location
+						locationsNew.push(locations[i]);
+					console.log('locationsNew: ', locationsNew);
+				return getCenter(locationsNew);
+			}
+
+			let potentialCenter = getCenter(locations);
+			console.log(`Potential Center at ${potentialCenter[0]}, ${potentialCenter[1]}`)
+
+			let potentialMarker = new google.maps.Marker({
+				position: {
+					lat: potentialCenter[0],
+					lng: potentialCenter[1]
+				},
 				map: map,
-				title: data.title,
+				title: 'Potential Center',
 				icon: {                             
-					url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+					url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
 				}
 			});
-			}	
-		 })
+
+			getDistancesFromCenter(locations);
+
+			let finalCenter = getFinalCenter();
+			console.log(`Final Center at ${finalCenter[0]}, ${finalCenter[1]}`)
+
+			let finalMarker = new google.maps.Marker({
+				position: {
+					lat: finalCenter[0],
+					lng: finalCenter[1]
+				},
+				map: map,
+				title: 'Final Center',
+				icon: {                             
+					url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+				}
+			});
+
+			getDistancesFromCenter(locationsNew);
+
+			function letsDrinkABeer() {
+				map.panTo({ lat: finalCenter[0], lng: finalCenter[1] });
+				map.setZoom(16);
+
+				let service = new google.maps.places.PlacesService(map);
+				service.nearbySearch({
+					location : { lat: finalCenter[0], lng: finalCenter[1] },
+					radius : 500,
+					type : [ 'bar' ]
+				}, callback);
+	
+				function callback(results, status) {
+					if (status === google.maps.places.PlacesServiceStatus.OK) {
+						const displayBars = document.getElementById("display-bars");
+						displayBars.innerHTML = `<p style="color: red">NEARY BARS:</p>`;
+						console.log('nearby bars: ', results);
+						for (var i = 0; i < results.length; i++) {
+							createMarker(results[i]);
+							displayBarInfo(results[i], displayBars);
+						}
+					}
+				}
+
+				function createMarker(place) {
+					var placeLoc = place.geometry.location;
+					var marker = new google.maps.Marker({
+						map : map,
+						position : place.geometry.location,
+						title : place.name,
+						icon: {                             
+							url: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bar-71.png",
+							scaledSize: new google.maps.Size(25, 25)
+						}
+					});
+		
+					// google.maps.event.addListener(marker, 'click', function() {
+					// 	const infowindow = new google.maps.InfoWindow();
+					// 	infowindow.setContent(place.name);
+					// 	infowindow.open(map, this);
+					// });
+				}
+
+				function displayBarInfo(bar, displayBars) {
+					// sometimes there's no rating for a place so the rating was displayed as "undefined". The code below shows an empty string instead
+					let rating;
+					if (bar.rating)
+						rating = bar.rating;
+					else
+						rating = '';
+
+					displayBars.innerHTML += `
+					<div id="bar">
+					<a id="bar-link" href="https://maps.google.com/maps?q=loc:${bar.name}, Berlin" target="_blank">${bar.name}</a> | Rating: ${rating}</p>
+					</div>
+					`;
+				}
+
+			}
+
+			document.getElementById("btn-beer").addEventListener("click", letsDrinkABeer, {once : true});
+			
+			// function getDistancesFromCenter(arr) {
+			// 	let latArray = [];
+			// 	let lngArray = [];
+			// 	let distancesY = [];
+			// 	let distancesX = [];
+			// 	let latSum = 0;
+			// 	let lngSum = 0;
+			// 	for (let location of arr) {
+			// 		//console.log(location.position.lat);
+			// 		latSum += location.position.lat;
+			// 		latArray.push(location.position.lat);
+			// 		lngSum += location.position.lng;
+			// 		lngArray.push(location.position.lng);
+			// 	}
+			// 	let latAvg = latSum / arr.length;
+			// 	let lngAvg = lngSum / arr.length;
+			// 	let distanceTotal = [];
+			// 	let potentialCenter = [latAvg, lngAvg];
+			// 	//console.log(lats)
+			// 	for (let lat of latArray) {
+			// 		//console.log(lat)
+			// 		distancesY.push(Math.abs(latAvg - lat));
+			// 	}
+			// 	for (let lng of lngArray) {
+			// 		//console.log(lat)
+			// 		distancesX.push(Math.abs(lngAvg - lng));
+			// 	}
+			// 	// console.log(distancesX)
+			// 	// console.log(distancesY)
+			// 	for (let i = 0; i < arr.length; i++) {
+			// 		distanceTotal.push(Math.sqrt(distancesX[i]**2 + distancesY[i]**2))
+			// 	}
+			// 	console.log('distanceTotal: ', distanceTotal);
+			// 	console.log('potentialCenter: ', potentialCenter);
+			// 	const n = distanceTotal.length;
+			// 	const mean = distanceTotal.reduce((a, b) => a + b) / n;
+			// 	const stdDev = Math.sqrt(distanceTotal.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+			// 	console.log('stdDev: ', stdDev);
+			// 	console.log('mean: ', mean);
+			// }
+
+			// getDistancesFromCenter(locations);
+		})	
+	
 		.catch(err => { console.log(err); })
 
-		// console.log('locs: ', locs)
-	
-	// axios.get(`localhost:3000/someUrl`)
-	// 	.then(response => {
-	// 		console.log(response.data[0]);
-	// 		const countryDetails = response.data[0];
-	// 		// we update the dom with the data from the api
-	// 		document.querySelector('#country-name').innerText = countryDetails.name;
-	// 		document.querySelector('#country-population').innerText = countryDetails.population;
-	// 		document.querySelector('#country-flag').setAttribute('src', countryDetails.flag);
+	const onChangeHandler = function () {
+		calculateAndDisplayRoute(directionsService, directionsRenderer);
+	};
 
-	// 	})
-	// 	.catch(err => {
-	// 		console.log(err);
-	// 	})
-
-
-  	// var markers = [
-	// 	{
-	// 		"title": 'Andrew',
-	// 		"lat": '52.48165332648858',
-	// 		"lng": '13.430200542444746',
-	// 	},
-	// 	{
-	// 		"title": 'John Flanders',
-	// 		"lat": '52.50000624341336',
-	// 		"lng": '13.407331065088137',
-	// 	},
-	// 	{
-	// 		"title": 'Mario Calabaza',
-	// 		"lat": '52.528425739135514',
-	// 		"lng": '13.350475589437893',
-	// 	},
-	// 	{
-	// 		"title": 'Charlotte Helvetica',
-	// 		"lat": '52.52283368313142',
-	// 		"lng": '13.445304644505404',
-	// 	},
-	// 	{
-	// 		"title": 'Carlos Danger',
-	// 		"lat": '52.49915532949563',
-	// 		"lng": '13.324879639545088',
-	// 	}
-    // ];
-
-  	// for (let i = 0; i < markers.length; i++) {
-	// 	var data = markers[i]
-	// 	var myLatlng = new google.maps.LatLng(data.lat, data.lng);
-	// 	var marker = new google.maps.Marker({
-	// 		position: myLatlng,
-	// 		map: map,
-	// 		title: data.title,
-	// 		icon: {                             
-	// 			url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-	// 		}
-	// 	});
-  	// }
-
-  	// const firstRandomHome = new google.maps.Marker({
-    // 	position: {
-    //   		lat: 52.54236280866809,
-    //   		lng: 13.3802352451393
-    // 	},
-    // 	map: map,
-    // 	title: "First random home"
-  	// });
-
-  	// const secondRandomHome = new google.maps.Marker({
-    // 	position: {
-    //   		lat: 52.52242249057365,
-    //   		lng: 13.357630834676086
-    // 	},
-    // 	map: map,
-    // 	title: "Second random home"
-  	// });
-
-  	const onChangeHandler = function () {
-    	calculateAndDisplayRoute(directionsService, directionsRenderer);
-  	};
-  	document.getElementById("start").addEventListener("change", onChangeHandler);
-  	document.getElementById("end").addEventListener("change", onChangeHandler);
+	document.getElementById("start").addEventListener("change", onChangeHandler);
+	document.getElementById("end").addEventListener("change", onChangeHandler);
 }
 
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {

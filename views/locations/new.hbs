@@ -1,12 +1,16 @@
 <h2>{{title}}</h2>
 
-<div class="location">
+<div class="form">
 	<form action="/locations" method="POST">
 		<label for="name">Name: </label><input id="name" type="text" name="name" placeholder="Name">
 		<label for="address">Address: </label><input id="address" type="text" name="address" placeholder="address">
+	
 		<label for="latitude">Latitude: </label><input id="lat" type="text" name="lat" placeholder="lat">
+		
 		<label for="lng">Longitude: </label><input id="lng" type="text" name="lng" placeholder="lng">
+		
 		<label for="imageUrl">Image: </label><input id="imageUrl" type="text" name="imageUrl" placeholder="imageUrl">
+		
 		<button id="btn-submit">Add location</button>
   	</form>
 </div>

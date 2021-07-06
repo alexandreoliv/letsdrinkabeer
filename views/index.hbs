@@ -18,7 +18,9 @@
 		<div id="container">
 			<div id="map"></div>
 			<div id="sidebar">
-				{{#each locations}}
+				<button id="btn-beer">Let's drink a beer</button>
+				<div id="display-bars"></div>
+				{{!-- {{#each locations}}
 					<div>
 						<p>Name: {{name}}</p>
 						<p>Address: {{address}}</p>
@@ -26,7 +28,7 @@
 						<p>Longitude: {{position.lng}}</p>
 						<p>Owner: {{owner}}</p>
 					</div>
-				{{/each}}
+				{{/each}} --}}
 			</div>
 		</div>
 		
@@ -46,32 +48,9 @@
 				</select>
 			</div>
 		</div>
-		
-	{{!-- <div id="floating-panel">
-		<b>Start: </b>
-		<select id="start">
-			<option value="Brandenburg Gate, Berlin">Brandenburg Gate</option>
-			<option value="World Time Clock, Berlin">World Time Clock</option>
-			<option value="Berlin Cathedral">Berlin Cathedral</option>
-			<option value="Berliner Fernsehturm">Berliner Fernsehturm</option>
-			<option value="East Side Gallery, Berlin">East Side Gallery</option>
-			<option value="Reichstag, Berlin">Reichstag</option>
-			<option value="Ironhack Berlin">Ironhack Berlin</option>
-		</select>
-		<b>End: </b>
-		<select id="end">
-			<option value="Brandenburg Gate, Berlin">Brandenburg Gate</option>
-			<option value="World Time Clock, Berlin">World Time Clock</option>
-			<option value="Berlin Cathedral">Berlin Cathedral</option>
-			<option value="Berliner Fernsehturm">Berliner Fernsehturm</option>
-			<option value="East Side Gallery, Berlin">East Side Gallery</option>
-			<option value="Reichstag, Berlin">Reichstag</option>
-			<option value="Ironhack Berlin">Ironhack Berlin</option>
-		</select>
-		</div> --}}
 
 			<div id="map"></div>
 
-			<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&libraries=&v=weekly" async></script>
+			<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&libraries=places&v=weekly" async></script>
 	</body>
 </html>

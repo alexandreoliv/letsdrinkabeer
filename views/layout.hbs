@@ -15,6 +15,9 @@
           <a href="/">Home</a>
           <a href="/locations">My Locations</a>
           <a href="/locations/new">Add Location</a>
+          {{#if admin}}
+          <a href="/admin">All Locations</a>
+          {{/if}}
         </div>
         <div id="login-logout">
           <a href="/logout">Log out</a>

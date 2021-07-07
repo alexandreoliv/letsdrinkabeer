@@ -30,10 +30,7 @@ function initMap() {
 					return new Promise(function(resolve, reject) {
 						geocoder.geocode({'address': address}, function(results, status) {
 							if (status === 'OK') {
-								// console.log(results);
 								resolve([results[0].geometry.location.lat(), results[0].geometry.location.lng()]);
-							} else {
-								reject(new Error('Couldnt\'t find the location ' + address));
 							}
 						})
 					})
@@ -50,15 +47,13 @@ function initMap() {
 				let locationsArray = getPoints(geocoder,map)
 				
 				Promise.all(locationsArray)     
-				.then(function(returnVals){
+				.then(function(positions){
 					// you should have return values here when
-					// all promises have rsolved
-					console.log('please make alex happy: ', returnVals);
+					// all promises have resolved
 					for (let i = 0; i < locations.length; i++) {
-						console.log('returnVals[i]: ', returnVals[i])
 						myLatLng = {
-							lat: returnVals[i][0],
-							lng: returnVals[i][1]
+							lat: positions[i][0],
+							lng: positions[i][1]
 						};
 						let marker = new google.maps.Marker({
 							position: myLatLng,
@@ -96,7 +91,7 @@ function initMap() {
 						let distanceTotal = [];
 						let mean = 0;
 						let stdDev = 0;
-						let locationsNew = [ ];
+						let positionsNew = [ ];
 		
 						function getCenter(arr) {
 							latSum = 0;
@@ -104,10 +99,10 @@ function initMap() {
 							lngSum = 0;
 							lngArray = [ ];
 							for (let location of arr) {
-								latSum += location.position.lat;
-								latArray.push(location.position.lat);
-								lngSum += location.position.lng;
-								lngArray.push(location.position.lng);
+								latSum += location[0];
+								latArray.push(location[0]);
+								lngSum += location[1];
+								lngArray.push(location[1]);
 							}
 							latAvg = latSum / arr.length;
 							lngAvg = lngSum / arr.length;
@@ -136,16 +131,15 @@ function initMap() {
 						}
 		
 						function getFinalCenter() {
-							locationsNew = [ ];
-							console.log('locations: ', locations)
+							positionsNew = [ ];
 							for (let i = 0; i < locations.length; i++)
-								if (Math.abs(distanceTotal[i] - mean) <= stdDev) // if distance from this location to the potencial center is less than the standard deviation), keep the location
-									locationsNew.push(locations[i]);
-								console.log('locationsNew: ', locationsNew);
-							return getCenter(locationsNew);
+								if (Math.abs(distanceTotal[i] - mean) <= stdDev) // if distance from this location to the potential center is less than the standard deviation), keep the location
+									positionsNew.push(positions[i]);
+								console.log('positionsNew: ', positionsNew);
+							return getCenter(positionsNew);
 						}
 		
-						let potentialCenter = getCenter(locations);
+						let potentialCenter = getCenter(positions);
 						console.log(`Potential Center at ${potentialCenter[0]}, ${potentialCenter[1]}`)
 		
 						// adds the potential center to the map (yellow marker)
@@ -179,7 +173,7 @@ function initMap() {
 							}
 						});
 		
-						getDistancesFromCenter(locationsNew);
+						getDistancesFromCenter(positionsNew);
 		
 						// >>>>>>>>>>>>>>>>>>> ----------------------- NEW CODE STARTING HERE ------------------------- <<<<<<<<<<<<<<<<<<<<<<<<<
 						function calcRoute() {
@@ -271,19 +265,8 @@ function initMap() {
 					// listener for the 'Let's drink a beer' button
 					document.getElementById("btn-beer").addEventListener("click", letsDrinkABeer, {once : true});
 				})
-
-				// geocoder.geocode( { 'address': locations[i].address }, function(results, status) {
-				// 	if (status == 'OK') {
-				// 		myLatLng = new google.maps.LatLng( results[0].geometry.location.lat(), results[0].geometry.location.lng() );
-				// 		console.log('gps:', results[0].geometry.location.lat(), results[0].geometry.location.lng())
-				// 	}
-				// })
-				
-			
 			}
-
-
-			
+		
 		})	
 	
 		.catch(err => { console.log(err); })
@@ -305,29 +288,3 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   		})
   		.catch((e) => window.alert("Directions request failed due to " + status));
 }
-
-// geocoder for translating addresses into coordinates:
-
-// const geocoder = new google.maps.Geocoder();
-
-// document.getElementById('submit').addEventListener('click', () => {
-//   geocodeAddress(geocoder, map);
-// });
-
-// function geocodeAddress(geocoder, resultsMap) {
-//   const address = document.getElementById('address').value;
-
-//   geocoder.geocode({ address: address }, (results, status) => {
-//     if (status === 'OK') {
-//       resultsMap.setCenter(results[0].geometry.location);
-//       let marker = new google.maps.Marker({
-//         map: resultsMap,
-//         position: results[0].geometry.location
-//       });
-//       document.getElementById('latitude').value = results[0].geometry.location.lat();
-//       document.getElementById('longitude').value = results[0].geometry.location.lng();
-//     } else {
-//       console.log(`Geocode was not successful for the following reason: ${status}`);
-//     }
-//   });
-// }

@@ -53,17 +53,13 @@ router.get("/getlocations", (req, res, next) => {
 //call getGeo inside this function to get position:
 router.post("/locations", loginCheck(), (req, res, next) => {
   console.log('----->>> POST /locations called');
-  const { name, address, imageUrl, lat, lng } = req.body;
+  const { name, address, imageUrl } = req.body;
   const { _id } = req.user;
   Location
     .create ({
       name,
       address,
       imageUrl,
-      position: {
-        lat,
-        lng
-      },
       owner: _id
     })
     .then(() => res.redirect('/locations'))
@@ -140,15 +136,11 @@ router.get("/locations/:id/delete", (req, res, next) => {
 
 router.post("/locations/:id/edit", (req, res, next) => {
   console.log('----->>> POST /locations/:id/edit called');
-  const { name, address, imageUrl, lat, lng } = req.body;
+  const { name, address, imageUrl } = req.body;
   Location.findByIdAndUpdate(req.params.id, {
     name,
     address,
-    imageUrl,
-    position: {
-      lat,
-      lng
-    }
+    imageUrl
   })
 	.then(location => {
     console.log(`Successully edited ${location}`);

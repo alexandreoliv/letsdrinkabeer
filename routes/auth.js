@@ -1,11 +1,6 @@
 const router = require("express").Router();
 const User = require('../models/User');
-// const bcrypt = require('bcrypt');
 const passport = require('passport');
-
-// router.get('/login', (req, res, next) => {
-// 	res.render('login');
-// });
 
 router.get('/login', passport.authenticate('github'));
 
@@ -15,12 +10,6 @@ router.get('/auth/github/callback',
 		successRedirect: '/',
 		failureRedirect: '/login'
 	}));
-
-// router.post('/login', passport.authenticate('local', {
-// 	successRedirect: '/',
-// 	failureRedirect: '/login',
-// 	passReqToCallback: true
-// }));
 
 router.get('/logout', (req, res, next) => {
 	console.log('user BEFORE log out: ' + req.user)

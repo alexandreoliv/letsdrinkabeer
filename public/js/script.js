@@ -21,7 +21,7 @@ function initMap() {
   	map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
 
 	axios
-		.get('http://127.0.0.1:3000/getlocations')
+		.get('/getlocations')
 		.then(response => {
 			// console.log('Locations: ', response.data.locations);
 

@@ -18,11 +18,4 @@ router.get('/logout', (req, res, next) => {
 	res.redirect('/');
 });
 
-const ensureLogin = require('connect-ensure-login');
-
-router.get('/private', ensureLogin.ensureLoggedIn(), (req, res) => {
-	console.log('user arriving at the private page: ' + req.user.username)
-	res.render('auth/private', { user: req.user, title: 'Private page for ' + req.user.username });
-});
-
 module.exports = router;

@@ -285,15 +285,9 @@ function initMap() {
 					  		let menuEnd =  document.getElementById('end');
 					  		let option = document.createElement('option')
 					  		option.setAttribute('value',`${finalCenter[0]}, ${finalCenter[1]}`);
-					  		option.innerHTML = 'Final Center';
+					  		option.innerHTML = "Let's Drink a Beer";
 					  		menuEnd.appendChild(option);
 
-					  		// updates the menu so that you can calculate your route to the center point:
-					  		let option2 = document.createElement('option')
-					  		option2.setAttribute('value',`${previousFinalCenter[0]}, ${previousFinalCenter[1]}`);
-					  		option2.innerHTML = 'Previous Final Center';
-					  		menuEnd.appendChild(option2);
-					  
 					  		// add listeners so that the floating panel distances can be calculated
 					  		const onChangeHandler = function () {
 						  		calculateAndDisplayRoute(directionsService, directionsRenderer);
@@ -302,7 +296,7 @@ function initMap() {
 					  		document.getElementById("end").addEventListener("change", onChangeHandler);
 				  		}
 						
-						async function christmasParty() {
+						function christmasParty() {
 							// creates the floating panel
 							const directionsService = new google.maps.DirectionsService();
 							const directionsRenderer = new google.maps.DirectionsRenderer();

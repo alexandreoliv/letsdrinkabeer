@@ -327,20 +327,19 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   		.catch((e) => window.alert("Directions request failed due to " + status));
 }
 
+// autocomplete function:
 let autocomplete;
 let addressField;
-
 function initAutocomplete() {
-  addressField = document.querySelector("#address");
-  // Create the autocomplete object, restricting the search predictions to
-  // addresses in the US and Canada.
-  autocomplete = new google.maps.places.Autocomplete(addressField, {
-   // componentRestrictions: { country: ["us", "ca"] },
-    fields: ["address_components", "geometry"],
-    types: ["address"],
-  });
-  addressField.focus();
-  // When the user selects an address from the drop-down, populate the
-  // address fields in the form.
-  //autocomplete.addListener("place_changed", fillInAddress);
+	addressField = document.querySelector("#address");
+  	// create the autocomplete object, restricting the search predictions to
+  	// addresses in the US and Canada
+  	autocomplete = new google.maps.places.Autocomplete(addressField, {
+   	// componentRestrictions: { country: ["us", "ca"] },
+    	fields: ["address_components", "geometry"],
+    	types: ["address"],
+  	});
+  	addressField.focus();
+  	// when the user selects an address from the drop-down, populate the
+  	// address fields in the form.
 }

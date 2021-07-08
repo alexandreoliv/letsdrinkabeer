@@ -284,13 +284,13 @@ function initMap() {
 					  		// updates the menu so that you can calculate your route to the center point:
 					  		let menuEnd =  document.getElementById('end');
 					  		let option = document.createElement('option')
-					  		option.setAttribute('value',`${finalCenter[0]}, ${finalCenter[1]}`); // fake address, need to do this dinamically
+					  		option.setAttribute('value',`${finalCenter[0]}, ${finalCenter[1]}`);
 					  		option.innerHTML = 'Final Center';
 					  		menuEnd.appendChild(option);
 
 					  		// updates the menu so that you can calculate your route to the center point:
 					  		let option2 = document.createElement('option')
-					  		option2.setAttribute('value',`${previousFinalCenter[0]}, ${previousFinalCenter[1]}`); // fake address, need to do this dinamically
+					  		option2.setAttribute('value',`${previousFinalCenter[0]}, ${previousFinalCenter[1]}`);
 					  		option2.innerHTML = 'Previous Final Center';
 					  		menuEnd.appendChild(option2);
 					  
@@ -301,9 +301,99 @@ function initMap() {
 					  		document.getElementById("start").addEventListener("change", onChangeHandler);
 					  		document.getElementById("end").addEventListener("change", onChangeHandler);
 				  		}
-	  
+						
+						async function christmasParty() {
+							// creates the floating panel
+							const directionsService = new google.maps.DirectionsService();
+							const directionsRenderer = new google.maps.DirectionsRenderer();
+							directionsRenderer.setMap(map);
+							directionsRenderer.setPanel(document.getElementById("sidebar"));
+							const control = document.getElementById("floating-panel");
+							map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
+	
+							function getDistance(placeA, placeB) {
+								console.log('function getDistance called');
+								// console.log('this is placeA: ', placeA);
+								// console.log('this is placeB: ', placeB);
+								let distanceLat = Math.abs(placeA[0] - placeB[0]);
+								let distanceLng = Math.abs(placeA[1] - placeB[1]);
+								let distance = Math.sqrt(distanceLat**2 + distanceLng**2);
+								// console.log(`distance between ${placeA} and ${placeB} = ${distance}`);
+								return distance;
+							}
+
+							function createDistanceMatrix(arr) {
+								console.log('function createDistanceMatrix called');
+								let distanceMatrix = [];
+								for (let i = 0; i < arr.length; i++) {
+									distanceMatrix[i] = [];
+									for (let j = 0; j < arr.length; j++) {
+										distanceMatrix[i][j] = getDistance(arr[i], arr[j]);
+									}	
+								}
+								// console.log(`distance matrix is: ${distanceMatrix}`);
+								return distanceMatrix;
+							}
+
+							let distanceMatrix = createDistanceMatrix(positions);
+
+							function calculateClosestLocation(matrix) {
+								console.log('function calculateClosestLocation called');
+								let distancesArray = [];
+								const min = {};
+								for (let i = 0; i < matrix.length; i++) {
+									distancesArray[i] = 0;
+									for (let j = 0; j < matrix.length; j++) {
+										distancesArray[i] += matrix[i][j];
+									}
+									if (!min.distance || distancesArray[i] < min.distance) {  // if it's the first calculation or if the current value is the closest location, then update closest location
+										min.distance = distancesArray[i];
+										min.location = i;
+									}
+								}
+								console.log(`closest location is location ${min.location} with only ${min.distance} distance`) ;
+								return min.location;
+							}
+
+							let closestLocation = calculateClosestLocation(distanceMatrix);
+							// console.log(locations[closestLocation]);
+							// console.log(positions[closestLocation]);
+
+							// changes the center of the map to the closest location and zooms out
+							map.panTo({ lat: positions[closestLocation][0], lng: positions[closestLocation][1] });
+							map.setZoom(14);
+	
+							// displays the closest location in the panel
+							const displayBars = document.getElementById("display-bars");
+							displayBars.innerHTML = `
+													<p style="color: red">CLOSEST HOUSE:</p>
+													<div id="bar">
+														<p>${locations[closestLocation].name}</p>
+														<p>${locations[closestLocation].address}</p>
+														<br>
+														<p>Enjoy your Christmas party! 🍷🎄🎁</p>
+													</div>`;
+	
+							// // updates the menu so that you can calculate your route to the closest location:
+							let menuEnd =  document.getElementById('end');
+							let option = document.createElement('option')
+							option.setAttribute('value',`${positions[closestLocation][0]}, ${positions[closestLocation][1]}`);
+							option.innerHTML = 'Closest Location';
+							menuEnd.appendChild(option);
+					
+							// add listeners so that the floating panel distances can be calculated
+							const onChangeHandler = function () {
+								calculateAndDisplayRoute(directionsService, directionsRenderer);
+							};
+							document.getElementById("start").addEventListener("change", onChangeHandler);
+							document.getElementById("end").addEventListener("change", onChangeHandler);
+						}
+
 				  		// listener for the 'Let's drink a beer' button
 				  		document.getElementById("btn-beer").addEventListener("click", letsDrinkABeer, {once : true});
+
+						// listener for the 'Christmas party' button
+						document.getElementById("btn-christmas").addEventListener("click", christmasParty, {once : true});
 			  		})
 		  	}
 	  	})	

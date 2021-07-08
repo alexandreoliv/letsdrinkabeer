@@ -2,10 +2,10 @@
 
 {{#with location}}
 	<div id="location">
-		<form action="/locations/{{_id}}/edit" method="POST">
+		<form action="/locations/{{_id}}/edit" method="POST" enctype="multipart/form-data">
 			<label for="name">Name: </label><input id="name" type="text" name="name" value="{{name}}">
 			<label for="address">Address: </label><input id="address" type="text" name="address" value="{{address}}">
-			<label for="imageUrl">Image: </label><input id="imageUrl" type="text" name="imageUrl" value="{{imageUrl}}">
+			<label for="imageUrl">Image: </label><input id="imageUrl" type="file" name="imageUrl" value="{{imageUrl}}">
 			<button id="btn-submit">Submit Edit</button>
 		</form>
 	</div>

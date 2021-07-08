@@ -8,18 +8,19 @@ const { fileUploader, cloudinary } = require('../config/cloudinary');
 const loginCheck = () => {
   return (req, res, next) => {
     // is there a logged in user - using passport you can use req.isAuthenticated()
+    console.log('checking if authenticated');
     if (req.isAuthenticated()) {
+      console.log('yes, authenticated');
       // proceed as intended
       next();
     } else {
+      console.log('no, not authenticated');
       // there is no user logged in
       // we redirect to /login
       res.redirect('/login');
     }
   }
 }
-
-// getGeoLocation()
 
 router.get("/", (req, res, next) => {
   const api_key = process.env.GOOGLEMAPS_KEY;
@@ -45,14 +46,6 @@ router.get("/getlocations", (req, res, next) => {
     .catch((err) => next(err));
 });
 
-// Our users can:
-// create new locations only when logged in
-// edit and delete the location only if they created them (if they are the owners)
-// see the list of the locations even though they are not logged in
-// Please proceed to create all the routes and files necessary to display forms and see the results after the submission.
-
-
-//call getGeo inside this function to get position:
 router.post("/locations", loginCheck(), fileUploader.single('imageUrl'), (req, res, next) => {
   console.log('----->>> POST /locations called');
   const { name, address } = req.body;
@@ -69,17 +62,6 @@ router.post("/locations", loginCheck(), fileUploader.single('imageUrl'), (req, r
     .then(() => res.redirect('/locations'))
     .catch((err) => next(err));
 });
-
-// router.post('/locations/new', fileUploader.single('image-upload'), (req, res) => {
-//   const { name, address } = req.body;
- 
-//   Location.create({ name, address, imageUrl: req.file.path })
-//     .then(newlyCreatedMovieFromDB => {
-//       console.log(newlyCreatedMovieFromDB);
-//     })
-//     .catch(error => console.log(`Error while creating a new movie: ${error}`));
-// });
-
 
 router.get('/locations', loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations called');
@@ -116,7 +98,6 @@ router.get('/locations/new', loginCheck(), (req, res, next) => {
   else
     res.render('locations/new', { api_key, user: req.user, title: 'Add Your Location' })
 });
-
 
 router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations/:id/edit called');

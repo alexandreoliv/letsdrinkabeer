@@ -26,8 +26,8 @@ function initMap() {
 				let data = locations[i]
 				let myLatLng;
 
-				function findLatLng(address, geocoder, map) {
-					return new Promise(function(resolve, reject) {
+				function findLatLng(address, geocoder) {
+					return new Promise(function(resolve) {
 						geocoder.geocode({'address': address}, function(results, status) {
 							if (status === 'OK') {
 								resolve([results[0].geometry.location.lat(), results[0].geometry.location.lng()]);
@@ -38,8 +38,8 @@ function initMap() {
 
 				function getPoints(geocoder,map) {
 					let locationsArray = [];
-					for(let i = 0; i < locations.length; i++){
-						locationsArray.push(findLatLng(locations[i].address, geocoder, map))
+					for (let i = 0; i < locations.length; i++){
+						locationsArray.push(findLatLng(locations[i].address, geocoder))
 					}
 					return locationsArray // array of promises
 				}
@@ -70,7 +70,7 @@ function initMap() {
 					// now fits the map to the newly inclusive bounds
 					map.fitBounds(bounds);
 
-					function letsDrinkABeer() {
+					async function letsDrinkABeer() {
 						// creates the floating panel
 						const directionsService = new google.maps.DirectionsService();
 						const directionsRenderer = new google.maps.DirectionsRenderer();
@@ -89,9 +89,10 @@ function initMap() {
 						let latAvg;
 						let lngAvg;
 						let distanceTotal = [];
+						let distanceArray = [];
 						let mean = 0;
 						let stdDev = 0;
-						let positionsNew = [ ];
+						let positionsNew = [];
 		
 						function getCenter(arr) {
 							latSum = 0;
@@ -111,6 +112,7 @@ function initMap() {
 						}
 		
 						function getDistancesFromCenter(arr) {
+							console.log('function getDistancesFromCenter called')
 							distancesY = [];
 							distancesX = [];
 							distanceTotal = [];
@@ -129,16 +131,56 @@ function initMap() {
 							console.log('stdDev: ', stdDev);
 							console.log('mean: ', mean);
 						}
-		
-						function getFinalCenter() {
-							positionsNew = [ ];
+
+						async function getWalkingDistancesFromCenter() {
+							console.log('function getWalkingDistancesFromCenter called')
+							let sum = 0;
+							distanceArray = [];
+							for (let position of positions) {
+								// sum += await calcRoute(position, potentialCenter);
+								distanceArray.push(await calcRoute(position, potentialCenter));
+							}
+							
+							// console.log('sum of distances is: ', sum);
+							console.log('distanceArray is: ', distanceArray);
+							const n = positions.length;
+							mean = distanceArray.reduce((a, b) => a + b) / n;
+							stdDev = Math.sqrt(distanceArray.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+							console.log('new stdDev: ', stdDev);
+							console.log('new mean: ', mean);
+						}
+						
+						async function calcRoute(origin, destination) {
+							// console.log('inside calcRoute, origin and destination are: ', origin, destination)
+							let request = {
+								origin: {
+									lat: origin[0],
+									lng: origin[1]
+								},
+								destination : {
+									lat: destination[0],
+									lng: destination[1]
+								},
+								travelMode: 'WALKING'
+							};
+
+							let distance = await directionsService.route(request)
+							return distance.routes[0].legs[0].distance.value / 1000;
+								// console.log(result.routes[0].legs[0].distance.value / 1000);
+						}
+
+						function getFinalCenter(arr) {
+							console.log('function getFinalCenter called')
+							positionsNew = [];
 							for (let i = 0; i < locations.length; i++)
-								if (Math.abs(distanceTotal[i] - mean) <= stdDev) // if distance from this location to the potential center is less than the standard deviation), keep the location
+								// if (Math.abs(arr[i] - mean) <= stdDev) // if distance from this location to the potential center is less than the standard deviation), keep the location
+								if (arr[i] - mean <= stdDev) // if distance from this location to the potential center is less than the standard deviation), keep the location
 									positionsNew.push(positions[i]);
-								console.log('positionsNew: ', positionsNew);
+								console.log('positionsNew, without any location that deviated too much: ', positionsNew);
 							return getCenter(positionsNew);
 						}
 		
+						console.log('-------->>>>>>> we start by calculating the potential center: <<<<<<<--------')
 						let potentialCenter = getCenter(positions);
 						console.log(`Potential Center at ${potentialCenter[0]}, ${potentialCenter[1]}`)
 		
@@ -155,9 +197,30 @@ function initMap() {
 							}
 						});
 		
+						console.log('-------->>>>>>> we now see how distant the locations are from the potential center: <<<<<<<--------')
 						getDistancesFromCenter(locations);
-		
-						let finalCenter = getFinalCenter();
+
+						console.log("-------->>>>>>> we now calculate Andrew's 'previous' final center: <<<<<<<--------")
+						let previousFinalCenter = getFinalCenter(distanceTotal);
+						console.log(`Previous Final Center at ${previousFinalCenter[0]}, ${previousFinalCenter[1]}`)
+
+						// adds the previous final center to the map (orange marker)
+						let previousFinalMarker = new google.maps.Marker({
+							position: {
+								lat: previousFinalCenter[0],
+								lng: previousFinalCenter[1]
+							},
+							map: map,
+							title: 'Previous Final Center',
+							icon: {
+								url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+							}
+						});
+
+						console.log('-------->>>>>>> we now see how walking-distant the locations are from the potential center: <<<<<<<--------')
+						await getWalkingDistancesFromCenter();
+
+						let finalCenter = getFinalCenter(distanceArray);
 						console.log(`Final Center at ${finalCenter[0]}, ${finalCenter[1]}`)
 		
 						// adds the final center to the map (green marker)
@@ -173,27 +236,9 @@ function initMap() {
 							}
 						});
 		
-						getDistancesFromCenter(positionsNew);
-		
-						// >>>>>>>>>>>>>>>>>>> ----------------------- NEW CODE STARTING HERE ------------------------- <<<<<<<<<<<<<<<<<<<<<<<<<
-						function calcRoute() {
-							let request = {
-								origin: 'Ironhack Berlin',
-								destination: 'BrewDog Berlin Mitte',
-								travelMode: 'WALKING'
-							}
-		
-							directionsService.route(request, function(result, status) {
-								if (status == 'OK')
-									console.log('Distance is: ', result.routes[0].legs[0].distance.value / 1000, 'km');
-							});
-						}
-						// >>>>>>>>>>>>>>>>>>> ----------------------- NEW CODE FINISHING HERE ------------------------- <<<<<<<<<<<<<<<<<<<<<<<<<
-		
-						calcRoute();
-		
-						map.panTo({ lat: finalCenter[0], lng: finalCenter[1] }); // changes the center of the map to the final center
-						map.setZoom(16); // zooms out
+						// changes the center of the map to the final center and zooms out
+						map.panTo({ lat: finalCenter[0], lng: finalCenter[1] });
+						map.setZoom(16);
 		
 						// finds the nearby bars
 						let service = new google.maps.places.PlacesService(map);
@@ -207,7 +252,7 @@ function initMap() {
 						function callback(results, status) {
 							if (status === google.maps.places.PlacesServiceStatus.OK) {
 								const displayBars = document.getElementById("display-bars");
-								displayBars.innerHTML = `<p style="color: red">NEARY BARS:</p>`;
+								displayBars.innerHTML = `<p style="color: red">NEARBY BARS:</p>`;
 								console.log('nearby bars: ', results);
 								for (var i = 0; i < results.length; i++) {
 									createMarker(results[i]);
@@ -247,12 +292,18 @@ function initMap() {
 							`;
 						}
 		
-						// new code for updating the menu so that you can calculate your route to the center point:
+						// updates the menu so that you can calculate your route to the center point:
 						let menuEnd =  document.getElementById('end');
 						let option = document.createElement('option')
-						option.setAttribute('value','Choriner Str. 52, 10435 Berlin'); // fake address, need to do this dinamically
+						option.setAttribute('value',`${finalCenter[0]}, ${finalCenter[1]}`); // fake address, need to do this dinamically
 						option.innerHTML = 'Final Center';
 						menuEnd.appendChild(option);
+
+						// updates the menu so that you can calculate your route to the center point:
+						let option2 = document.createElement('option')
+						option2.setAttribute('value',`${previousFinalCenter[0]}, ${previousFinalCenter[1]}`); // fake address, need to do this dinamically
+						option2.innerHTML = 'Previous Final Center';
+						menuEnd.appendChild(option2);
 						
 						// add listeners so that the floating panel distances can be calculated
 						const onChangeHandler = function () {

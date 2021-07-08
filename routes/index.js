@@ -53,7 +53,7 @@ router.get("/getlocations", (req, res, next) => {
 
 
 //call getGeo inside this function to get position:
-router.post("/locations", fileUploader.single('imageUrl'), (req, res, next) => {
+router.post("/locations", loginCheck(), fileUploader.single('imageUrl'), (req, res, next) => {
   console.log('----->>> POST /locations called');
   const { name, address } = req.body;
   const { _id } = req.user;
@@ -150,13 +150,14 @@ router.get("/locations/:id/delete", (req, res, next) => {
   .catch((err) => next(err));
 });
 
-router.post("/locations/:id/edit", (req, res, next) => {
+router.post("/locations/:id/edit", fileUploader.single('imageUrl'), (req, res, next) => {
   console.log('----->>> POST /locations/:id/edit called');
-  const { name, address, imageUrl } = req.body;
+  const { name, address} = req.body;
+  const imageUrl =  req.file.path;
   Location.findByIdAndUpdate(req.params.id, {
     name,
     address,
-    imageUrl
+    imageUrl, 
   })
 	.then(location => {
     console.log(`Successully edited ${location}`);

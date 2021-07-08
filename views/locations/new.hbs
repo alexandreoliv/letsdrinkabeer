@@ -1,10 +1,10 @@
 <h2>{{title}}</h2>
 
 <div class="form">
-	<form action="/locations" method="POST">
+	<form action="/locations" method="POST" enctype="multipart/form-data">
 		<label for="name">Name: </label><input id="name" type="text" name="name" placeholder="Jan Doe">
 		<label for="address">Address: </label><input id="address" type="text" name="address" placeholder="Fakestr. 123, Berlin 12050">
-		<label for="imageUrl">Image: </label><input id="imageUrl" type="text" name="imageUrl" placeholder="imageUrl">
+		<label for="imageUrl">Image: </label><input id="imageUrl" type="file" name="imageUrl" placeholder="Upload Image">
 		<button id="btn-submit">Add Location</button>
   	</form>
 </div>

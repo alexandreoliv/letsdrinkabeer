@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const Location = require('../models/Location');
 
+const { fileUploader, cloudinary } = require('../config/cloudinary');
+
 // create a middleware to check if the user is logged in
 const loginCheck = () => {
   return (req, res, next) => {
@@ -51,10 +53,12 @@ router.get("/getlocations", (req, res, next) => {
 
 
 //call getGeo inside this function to get position:
-router.post("/locations", loginCheck(), (req, res, next) => {
+router.post("/locations", loginCheck(), fileUploader.single('imageUrl'), (req, res, next) => {
   console.log('----->>> POST /locations called');
-  const { name, address, imageUrl } = req.body;
+  const { name, address } = req.body;
   const { _id } = req.user;
+  const imageUrl = req.file.path;
+  console.log(req.file);
   Location
     .create ({
       name,
@@ -65,6 +69,17 @@ router.post("/locations", loginCheck(), (req, res, next) => {
     .then(() => res.redirect('/locations'))
     .catch((err) => next(err));
 });
+
+// router.post('/locations/new', fileUploader.single('image-upload'), (req, res) => {
+//   const { name, address } = req.body;
+ 
+//   Location.create({ name, address, imageUrl: req.file.path })
+//     .then(newlyCreatedMovieFromDB => {
+//       console.log(newlyCreatedMovieFromDB);
+//     })
+//     .catch(error => console.log(`Error while creating a new movie: ${error}`));
+// });
+
 
 router.get('/locations', loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations called');
@@ -101,6 +116,7 @@ router.get('/locations/new', loginCheck(), (req, res, next) => {
     res.render('locations/new', { user: req.user, title: 'Add Your Location' })
 });
 
+
 router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations/:id/edit called');
     Location
@@ -134,13 +150,14 @@ router.get("/locations/:id/delete", (req, res, next) => {
   .catch((err) => next(err));
 });
 
-router.post("/locations/:id/edit", (req, res, next) => {
+router.post("/locations/:id/edit", fileUploader.single('imageUrl'), (req, res, next) => {
   console.log('----->>> POST /locations/:id/edit called');
-  const { name, address, imageUrl } = req.body;
+  const { name, address} = req.body;
+  const imageUrl =  req.file.path;
   Location.findByIdAndUpdate(req.params.id, {
     name,
     address,
-    imageUrl
+    imageUrl, 
   })
 	.then(location => {
     console.log(`Successully edited ${location}`);

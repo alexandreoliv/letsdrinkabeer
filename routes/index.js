@@ -101,7 +101,7 @@ router.get('/admin', loginCheck(), (req, res, next) => {
     Location.find()
       .then((locations) => {
         if (req.user.role === 'admin')
-          res.render('locations/admin', { locations, admin: req.user, user: req.user, title: 'All Locations' });
+          res.render('locations/admin', { api_key, locations, admin: req.user, user: req.user, title: 'All Locations' });
         else
           res.render('index', { api_key, locations, user: req.user, title: 'Home' })
       })
@@ -110,10 +110,11 @@ router.get('/admin', loginCheck(), (req, res, next) => {
 
 router.get('/locations/new', loginCheck(), (req, res, next) => {
   console.log('----->>> GET /locations/new called');
+  const api_key = process.env.GOOGLEMAPS_KEY;
   if (req.user.role === 'admin')
-    res.render('locations/new', { admin: req.user, user: req.user, title: 'Add Your Location' });
+    res.render('locations/new', { api_key, admin: req.user, user: req.user, title: 'Add Your Location' });
   else
-    res.render('locations/new', { user: req.user, title: 'Add Your Location' })
+    res.render('locations/new', { api_key, user: req.user, title: 'Add Your Location' })
 });
 
 
@@ -122,10 +123,11 @@ router.get("/locations/:id/edit", loginCheck(), (req, res, next) => {
     Location
     .findById(req.params.id)
     .then(location => {
+      const api_key = process.env.GOOGLEMAPS_KEY;
       if (JSON.stringify(location.owner) === JSON.stringify(req.user._id) || req.user.role === 'admin') {
         console.log('location is ', location);
-        res.render('locations/edit', { location, admin: req.user, user: req.user, title: 'Edit Location' })
-      }
+        res.render('locations/edit', { api_key, location, admin: req.user, user: req.user, title: 'Edit Location' })
+      } 
     })
     .catch((err) => next(err));
 });

@@ -1,11 +1,3 @@
-// document.addEventListener(
-// 	"DOMContentLoaded",
-//   	() => {
-//     	// console.log("project2 JS imported successfully!");
-//   	},
-//   	false
-// );
-
 // Google Maps configuration
 
 function initMap() {
@@ -136,14 +128,11 @@ function initMap() {
 
 					  		async function getWalkingDistancesFromCenter() {
 						  		console.log('function getWalkingDistancesFromCenter called');
-						  		let sum = 0;
 						  		distanceArray = [];
 						  		for (let position of positions) {
-							  		// sum += await calcRoute(position, potentialCenter);
 							  		distanceArray.push(await calcRoute(position, potentialCenter));
 						  		}
 						  
-						  		// console.log('sum of distances is: ', sum);
 						  		console.log('distanceArray is: ', distanceArray);
 						  		const n = positions.length;
 						  		mean = distanceArray.reduce((a, b) => a + b) / n;
@@ -289,8 +278,7 @@ function initMap() {
 								displayBars.innerHTML += `
 						  			<div id="bar">
 						  			<a id="bar-link" href="https://maps.google.com/maps?q=loc:${bar.name}, Berlin" target="_blank">${bar.name}</a> | Rating: ${rating}</p>
-						  			</div>
-						  		`;
+						  			</div>`;
 					  		}
 	  
 					  		// updates the menu so that you can calculate your route to the center point:

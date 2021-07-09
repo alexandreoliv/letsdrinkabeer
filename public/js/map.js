@@ -64,15 +64,23 @@ function initMap() {
 						// now fits the map to the newly inclusive bounds
 				  		map.fitBounds(bounds);
 
+						// creates the floating panel
+						const directionsService = new google.maps.DirectionsService();
+						const directionsRenderer = new google.maps.DirectionsRenderer();
+						directionsRenderer.setMap(map);
+						directionsRenderer.setPanel(document.getElementById("sidebar"));
+						const control = document.getElementById("floating-panel");
+						map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
+
+						// add listeners so that the floating panel distances can be calculated
+						const onChangeHandler = function () {
+							calculateAndDisplayRoute(directionsService, directionsRenderer);
+						};
+						document.getElementById("start").addEventListener("change", onChangeHandler);
+						document.getElementById("end").addEventListener("change", onChangeHandler);
+
+						// >>>>>>>>>>>>>>---------------------- LET'S DRINK A BEER STARTS HERE ----------------------<<<<<<<<<<<<<<
 				  		async function letsDrinkABeer() {
-					  		// creates the floating panel
-					  		const directionsService = new google.maps.DirectionsService();
-					  		const directionsRenderer = new google.maps.DirectionsRenderer();
-						  	directionsRenderer.setMap(map);
-					  		directionsRenderer.setPanel(document.getElementById("sidebar"));
-					  		const control = document.getElementById("floating-panel");
-					  		map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
-	  
 							// variables for calculating the final center
 							let latArray = [];
 							let lngArray = [];
@@ -287,24 +295,11 @@ function initMap() {
 					  		option.setAttribute('value',`${finalCenter[0]}, ${finalCenter[1]}`);
 					  		option.innerHTML = "Let's Drink a Beer";
 					  		menuEnd.appendChild(option);
-
-					  		// add listeners so that the floating panel distances can be calculated
-					  		const onChangeHandler = function () {
-						  		calculateAndDisplayRoute(directionsService, directionsRenderer);
-					  		};
-					  		document.getElementById("start").addEventListener("change", onChangeHandler);
-					  		document.getElementById("end").addEventListener("change", onChangeHandler);
 				  		}
+						// >>>>>>>>>>>>>>---------------------- LET'S DRINK A BEER FINISHES HERE ----------------------<<<<<<<<<<<<<<
 						
+						// >>>>>>>>>>>>>>---------------------- CHRISTMAS PARTY STARTS HERE ----------------------<<<<<<<<<<<<<<
 						function christmasParty() {
-							// creates the floating panel
-							const directionsService = new google.maps.DirectionsService();
-							const directionsRenderer = new google.maps.DirectionsRenderer();
-							directionsRenderer.setMap(map);
-							directionsRenderer.setPanel(document.getElementById("sidebar"));
-							const control = document.getElementById("floating-panel");
-							map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
-	
 							function getDistance(placeA, placeB) {
 								console.log('function getDistance called');
 								// console.log('this is placeA: ', placeA);
@@ -374,20 +369,123 @@ function initMap() {
 							option.setAttribute('value',`${positions[closestLocation][0]}, ${positions[closestLocation][1]}`);
 							option.innerHTML = 'Closest Location';
 							menuEnd.appendChild(option);
-					
-							// add listeners so that the floating panel distances can be calculated
-							const onChangeHandler = function () {
-								calculateAndDisplayRoute(directionsService, directionsRenderer);
-							};
-							document.getElementById("start").addEventListener("change", onChangeHandler);
-							document.getElementById("end").addEventListener("change", onChangeHandler);
 						}
+						// >>>>>>>>>>>>>>---------------------- CHRISTMAS PARTY FINISHES HERE ----------------------<<<<<<<<<<<<<<
 
-				  		// listener for the 'Let's drink a beer' button
+						let favouriteAreasArray = [];
+						// >>>>>>>>>>>>>>---------------------- FAVOURITE AREAS STARTS HERE ----------------------<<<<<<<<<<<<<<
+						function favouriteAreas() {
+							map.panTo( { lat: 52.520008, lng: 13.404954 } ); // Berlin
+							map.setZoom(12);
+
+							map.addListener('click', function(e) {
+								addFavouriteArea(e.latLng, map);
+							});
+							
+							function addFavouriteArea(position, map) {
+								let marker = new google.maps.Marker({
+									position: position,
+									map: map
+								});
+								// map.panTo(position);
+								favouriteAreasArray.push(position);
+								console.log('favouriteAreasArray: ', favouriteAreasArray);
+							}
+						}
+						// >>>>>>>>>>>>>>---------------------- FAVOURITE AREAS FINISHES HERE ----------------------<<<<<<<<<<<<<<
+
+						// >>>>>>>>>>>>>>---------------------- CLOSEST FAVOURITE AREAS STARTS HERE ----------------------<<<<<<<<<<<<<<
+						function closestFavouriteArea() {
+							let a = favouriteAreasArray[0].lat();
+							let b = favouriteAreasArray[0].lng();
+							console.log('a = ', a, ' | b = ', b);
+
+							function getDistance(placeA, placeB) {
+								console.log('function getDistance called');
+								// console.log('this is placeA: ', placeA);
+								// console.log('this is placeB: ', placeB);
+								let distanceLat = Math.abs(placeA.lat() - placeB[0]);
+								let distanceLng = Math.abs(placeA.lng() - placeB[1]);
+								let distance = Math.sqrt(distanceLat**2 + distanceLng**2);
+								// console.log(`distance between ${placeA} and ${placeB} = ${distance}`);
+								return distance;
+							}
+
+							function createDistanceMatrix(favourites, positions) {
+								console.log('function createDistanceMatrix called');
+								console.log('this is favourites: ', favourites);
+								console.log('this is positions: ', positions);
+								let distanceMatrix = [];
+								for (let i = 0; i < favourites.length; i++) {
+									distanceMatrix[i] = [];
+									for (let j = 0; j < positions.length; j++) {
+										distanceMatrix[i][j] = getDistance(favourites[i], positions[j]);
+									}	
+								}
+								console.log(`distance matrix is: ${distanceMatrix}`);
+								return distanceMatrix;
+							}
+
+						 	let distanceMatrix = createDistanceMatrix(favouriteAreasArray, positions);
+
+							function calculateClosestLocation(matrix, favourites, positions) {
+								console.log('function calculateClosestLocation called');
+								console.log('this is matrix: ', matrix);
+								let distancesArray = [];
+								const min = {};
+								for (let i = 0; i < favourites.length; i++) {
+									distancesArray[i] = 0;
+									for (let j = 0; j < positions.length; j++) {
+										distancesArray[i] += matrix[i][j];
+									}
+									if (!min.distance || distancesArray[i] < min.distance) {  // if it's the first calculation or if the current value is the closest location, then update closest location
+										min.distance = distancesArray[i];
+										min.location = i;
+									}
+								}
+								console.log(`closest favourite area is area ${min.location} with only ${min.distance} distance`) ;
+								return min.location;
+							}
+
+							let closestLocation = calculateClosestLocation(distanceMatrix, favouriteAreasArray, positions);
+							// console.log(locations[closestLocation]);
+							// console.log(positions[closestLocation]);
+
+							// changes the center of the map to the closest favourite area and zooms out
+							console.log('checking the coordinates of the closest location:')
+							console.log(favouriteAreasArray[closestLocation].lat())
+							console.log(favouriteAreasArray[closestLocation].lng())
+							map.panTo({ lat: favouriteAreasArray[closestLocation].lat(), lng: favouriteAreasArray[closestLocation].lng() });
+							map.setZoom(14);
+	
+							// displays the closest location in the panel
+							const displayBars = document.getElementById("display-bars");
+							displayBars.innerHTML = `
+													<p style="color: red">CLOSEST FAVOURITE AREA:</p>
+													<div id="bar">
+														<p>Enjoy your Closest Favourite Area! 🍷🎄🎁</p>
+													</div>`;
+	
+							// // updates the menu so that you can calculate your route to the closest favourite area:
+							let menuEnd =  document.getElementById('end');
+							let option = document.createElement('option')
+							option.setAttribute('value',`${favouriteAreasArray[closestLocation].lat()}, ${favouriteAreasArray[closestLocation].lng()}`);
+							option.innerHTML = 'Closest Favourite Area';
+							menuEnd.appendChild(option);
+						}
+						// >>>>>>>>>>>>>>---------------------- CLOSEST FAVOURITE AREAS FINISHES HERE ----------------------<<<<<<<<<<<<<<
+
+				  		// listener for the 'Let's Drink a Beer' button
 				  		document.getElementById("btn-beer").addEventListener("click", letsDrinkABeer, {once : true});
 
-						// listener for the 'Christmas party' button
+						// listener for the 'Christmas Party' button
 						document.getElementById("btn-christmas").addEventListener("click", christmasParty, {once : true});
+
+						// listener for the 'Favourite Areas' button
+						document.getElementById("btn-favourite").addEventListener("click", favouriteAreas, {once : true});
+						
+						// listener for the 'Closest Favourite Areas' button
+						document.getElementById("btn-closest-favourite").addEventListener("click", closestFavouriteArea);
 			  		})
 		  	}
 	  	})	
@@ -411,9 +509,10 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   		.catch((e) => window.alert("Directions request failed due to " + status));
 }
 
-// autocomplete function:
+// autocomplete functionality starts here:
 let autocomplete;
 let addressField;
+
 function initAutocomplete() {
 	addressField = document.querySelector("#address");
   	// create the autocomplete object, restricting the search predictions to

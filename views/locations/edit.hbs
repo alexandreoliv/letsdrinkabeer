@@ -1,13 +1,8 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <link
-      href="https://fonts.googleapis.com/css?family=Roboto:400,500"
-      rel="stylesheet"
-    />
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" />
 
 <h2>{{title}}</h2>
-
-
-	<div id="location">
+<div id="location">
 	{{#with location}}
 		<form action="/locations/{{_id}}/edit" method="POST" enctype="multipart/form-data">
 			<label for="name">Name: </label><input id="name" type="text" name="name" value="{{name}}" required>
@@ -16,9 +11,5 @@
 			<button id="btn-submit">Submit Edit</button>
 		</form>
 	{{/with}}
-		<script
-      src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initAutocomplete&libraries=places&v=weekly"
-      async
-    ></script>
-	</div>
-
+	<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initAutocomplete&libraries=places&v=weekly" async></script>
+</div>

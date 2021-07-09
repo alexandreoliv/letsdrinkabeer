@@ -1,9 +1,6 @@
-
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <link
-      href="https://fonts.googleapis.com/css?family=Roboto:400,500"
-      rel="stylesheet"
-    />
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" />
+
 <h2>{{title}}</h2>
 
 <div class="form">
@@ -13,8 +10,5 @@
 		<label for="imageUrl">Image: </label><input id="imageUrl" type="file" name="imageUrl" placeholder="Upload Image" required>
 		<button id="btn-submit">Add Location</button>
   	</form>
-	<script
-      src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initAutocomplete&libraries=places&v=weekly"
-      async
-    ></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initAutocomplete&libraries=places&v=weekly" async></script>
 </div>

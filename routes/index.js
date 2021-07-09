@@ -118,7 +118,7 @@ router.get("/locations/:id/delete", (req, res, next) => {
   Location
   .findById(req.params.id)
   .then(location => {
-    if (JSON.stringify(location.owner) === JSON.stringify(req.user._id)) {
+    if (JSON.stringify(location.owner) === JSON.stringify(req.user._id) || req.user.role === 'admin') {
       Location
       .findByIdAndDelete(req.params.id)
       .then(location => {

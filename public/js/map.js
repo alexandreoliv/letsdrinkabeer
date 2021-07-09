@@ -371,7 +371,7 @@ function initMap() {
 							let menuEnd =  document.getElementById('end');
 							let option = document.createElement('option')
 							option.setAttribute('value',`${positions[closestLocation][0]}, ${positions[closestLocation][1]}`);
-							option.innerHTML = 'Closest Location';
+							option.innerHTML = 'Christmas Party';
 							menuEnd.appendChild(option);
 						}
 						// >>>>>>>>>>>>>>---------------------- CHRISTMAS PARTY FINISHES HERE ----------------------<<<<<<<<<<<<<<

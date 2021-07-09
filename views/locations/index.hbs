@@ -1,18 +1,19 @@
 {{#with user}}
 <h2 class="title">Locations for {{username}}</h2>
 {{/with}}
+
  <div class="locations">
 	{{#each location}}
-  		<div class="location">
-			<h3>{{name}}</h3>
-			<img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
-			<p>{{address}}</p>
-			<form action="/locations/{{_id}}/edit" method="GET">
-				<button>Edit Location</button>
-			</form>
-			<form action="/locations/{{_id}}/delete" method="GET">
-				<button>Delete Location</button>
-			</form>
-  		</div>
+	<div class="location">
+		<h3>{{name}}</h3>
+		<img src="{{imageUrl}}" alt="Image of {{name}}" height="300">
+		<p>{{address}}</p>
+		<form action="/locations/{{_id}}/edit" method="GET">
+			<button>Edit Location</button>
+		</form>
+		<form action="/locations/{{_id}}/delete" method="GET">
+			<button>Delete Location</button>
+		</form>
+	</div>
 	{{/each}}
 </div>

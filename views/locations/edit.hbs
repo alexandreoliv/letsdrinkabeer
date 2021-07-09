@@ -2,14 +2,15 @@
 <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" />
 
 <h2>{{title}}</h2>
+
 <div id="location">
 	{{#with location}}
-		<form action="/locations/{{_id}}/edit" method="POST" enctype="multipart/form-data">
-			<label for="name">Name: </label><input id="name" type="text" name="name" value="{{name}}" required>
-			<label for="address">Address: </label><input id="address" type="text" autocomplete="off" name="address" value="{{address}}" required>
-			<label for="imageUrl">Image: </label><input id="imageUrl" type="file" name="imageUrl" value="{{imageUrl}}" required>
-			<button id="btn-submit">Submit Edit</button>
-		</form>
+	<form action="/locations/{{_id}}/edit" method="POST" enctype="multipart/form-data">
+		<label for="name">Name: </label><input id="name" type="text" name="name" value="{{name}}" required>
+		<label for="address">Address: </label><input id="address" type="text" autocomplete="off" name="address" value="{{address}}" required>
+		<label for="imageUrl">Image: </label><input id="imageUrl" type="file" name="imageUrl" value="{{imageUrl}}" required>
+		<button id="btn-submit">Submit Edit</button>
+	</form>
 	{{/with}}
 	<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initAutocomplete&libraries=places&v=weekly" async></script>
 </div>

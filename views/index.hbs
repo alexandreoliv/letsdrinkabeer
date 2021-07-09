@@ -5,23 +5,20 @@
 	<head>
 		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     	<title>My First Map</title>
-    	<style>
-      		#map {
-      			height: 600px;
-        		width: 50%;
-       		}
-    	</style>
   	</head>
   	<body>
-
 		<div id="container">
-			<div id="map"></div>
-			<div id="sidebar">
+			<div id="buttons">
 				<button id="btn-beer">Let's Drink a Beer</button>
 				<button id="btn-christmas">Christmas Party</button>
-				<button id="btn-favourite">Favourite Areas</button>
-				<button id="btn-closest-favourite">Closest Favourite Area</button>
-				<div id="display-bars"></div>
+				<button id="btn-favourite">Choose Favourite Areas</button>
+			</div>
+			<div id="map-sidebar">
+				<div id="sidebar-left"></div>
+				<div id="map"></div>
+				<div id="sidebar-right">
+					<div id="display-bars"></div>
+				</div>
 			</div>
 		</div>
 		
@@ -30,20 +27,17 @@
 				<b>Start: </b>
 				<select id="start">
 					{{#each locations}}
-						<option value="{{address}}">{{name}}</option>
+					<option value="{{address}}">{{name}}</option>
 					{{/each}}
 				</select>
 				<b>End: </b>
 				<select id="end">
 					{{#each locations}}
-						<option value="{{address}}">{{name}}</option>
+					<option value="{{address}}">{{name}}</option>
 					{{/each}}
 				</select>
 			</div>
 		</div>
-
-			<div id="map"></div>
-
-			<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&libraries=places&v=weekly" async></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&libraries=places&v=weekly" async></script>
 	</body>
 </html>

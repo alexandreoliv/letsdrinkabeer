@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{{title}}</title>
-  <link rel="stylesheet" href="/stylesheets/style.css" />
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>{{title}}</title>
+	<link rel="stylesheet" href="/stylesheets/style.css" />
 </head>
 <body>
-  <nav>
-    <div id="nav-menu">
-      {{#if user}}
-        <div id="home-user">
-          <a href="/">Home</a>
-          <a href="/locations">My Locations</a>
-          <a href="/locations/new">Add Location</a>
-          {{#if admin}}
-          <a href="/admin">All Locations</a>
-          {{/if}}
-        </div>
-        <div id="login-logout">
-          <a href="/logout">Log out</a>
-        </div>
-      {{else}}
-        <div id="home-user">
-          <a href="/">Home</a>
-        </div>
-        <div id="login-logout">
-          <a href="/login">Log in</a>
-        </div>
-      {{/if}}
-      {{!-- <a href="/locations">Your Location</a> --}}
-    </div>
-  </nav>
-  
-  <div id="body">
-    {{{body}}}
-  </div>
+	<nav>
+		<div id="nav-menu">
+			{{#if user}}
+			<div id="home-user">
+				<a href="/">Home</a>
+				<a href="/locations">My Locations</a>
+				<a href="/locations/new">Add Location</a>
+			{{#if admin}}
+				<a href="/admin">All Locations</a>
+			{{/if}}
+			</div>
+			<div id="login-logout">
+				<a href="/logout">Log out</a>
+			</div>
+			{{else}}
+			<div id="home-user">
+				<a href="/">Home</a>
+			</div>
+			<div id="login-logout">
+				<a href="/login">Log in</a>
+			</div>
+			{{/if}}
+		</div>
+	</nav>
 
-  <script src="/js/map.js"></script>
+	<div id="body">
+		{{{body}}}
+	</div>
+
+	<script src="/js/map.js"></script>
 </body>
 </html>

@@ -68,7 +68,7 @@ function initMap() {
 						const directionsService = new google.maps.DirectionsService();
 						const directionsRenderer = new google.maps.DirectionsRenderer();
 						directionsRenderer.setMap(map);
-						directionsRenderer.setPanel(document.getElementById("sidebar"));
+						directionsRenderer.setPanel(document.getElementById("sidebar-left"));
 						const control = document.getElementById("floating-panel");
 						map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
 
@@ -252,7 +252,9 @@ function initMap() {
 					  		function callback(results, status) {
 						  		if (status === google.maps.places.PlacesServiceStatus.OK) {
 							  		const displayBars = document.getElementById("display-bars");
-							  		displayBars.innerHTML = `<p style="color: red">NEARBY BARS:</p>`;
+							  		displayBars.innerHTML = `<p id="header" style="color: #C36220; font-size: 1.2em">LET'S DRINK A BEER! 🍺</p>
+									  						<p id="header">NEARBY BARS:</p>
+															<br>`;
 							  		console.log('nearby bars: ', results);
 							  		for (var i = 0; i < results.length; i++) {
 								  		createMarker(results[i]);
@@ -285,10 +287,10 @@ function initMap() {
 							  		rating = '';
 								displayBars.innerHTML += `
 						  			<div id="bar">
-						  			<a id="bar-link" href="https://maps.google.com/maps?q=loc:${bar.name}, Berlin" target="_blank">${bar.name}</a> | Rating: ${rating}</p>
+						  			<a id="bar-link" href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${bar.place_id}" target="_blank">${bar.name}</a> | Rating: ${rating}</p>
 						  			</div>`;
 					  		}
-	  
+							  	  
 					  		// updates the menu so that you can calculate your route to the center point:
 					  		let menuEnd =  document.getElementById('end');
 					  		let option = document.createElement('option')
@@ -300,6 +302,7 @@ function initMap() {
 						
 						// >>>>>>>>>>>>>>---------------------- CHRISTMAS PARTY STARTS HERE ----------------------<<<<<<<<<<<<<<
 						function christmasParty() {
+
 							function getDistance(placeA, placeB) {
 								console.log('function getDistance called');
 								// console.log('this is placeA: ', placeA);
@@ -354,13 +357,14 @@ function initMap() {
 	
 							// displays the closest location in the panel
 							const displayBars = document.getElementById("display-bars");
-							displayBars.innerHTML = `
-													<p style="color: red">CLOSEST HOUSE:</p>
+							displayBars.innerHTML = `<p id="header" style="color: #C36220; font-size: 1.2em">IT'S CHRISTMAS PARTY TIME! 🍷🎄🎁</p>
+													<p id="header">THE CLOSEST HOUSE FOR YOUR GROUP IS:</p>
+													<br>
 													<div id="bar">
 														<p>${locations[closestLocation].name}</p>
 														<p>${locations[closestLocation].address}</p>
 														<br>
-														<p>Enjoy your Christmas party! 🍷🎄🎁</p>
+														<p>Enjoy the party and don't forget to bring the wine!</p>
 													</div>`;
 	
 							// // updates the menu so that you can calculate your route to the closest location:
@@ -375,6 +379,11 @@ function initMap() {
 						let favouriteAreasArray = [];
 						// >>>>>>>>>>>>>>---------------------- FAVOURITE AREAS STARTS HERE ----------------------<<<<<<<<<<<<<<
 						function favouriteAreas() {
+							document.getElementById("btn-favourite").innerHTML = 'Find Closest Favourite Area';
+							document.getElementById("btn-favourite").setAttribute('id', "btn-closest-favourite");
+							// listener for the 'Closest Favourite Areas' button
+							document.getElementById("btn-closest-favourite").addEventListener("click", closestFavouriteArea);
+
 							map.panTo( { lat: 52.520008, lng: 13.404954 } ); // Berlin
 							map.setZoom(12);
 
@@ -458,13 +467,53 @@ function initMap() {
 							map.panTo({ lat: favouriteAreasArray[closestLocation].lat(), lng: favouriteAreasArray[closestLocation].lng() });
 							map.setZoom(14);
 	
-							// displays the closest location in the panel
-							const displayBars = document.getElementById("display-bars");
-							displayBars.innerHTML = `
-													<p style="color: red">CLOSEST FAVOURITE AREA:</p>
-													<div id="bar">
-														<p>Enjoy your Closest Favourite Area! 🍷🎄🎁</p>
-													</div>`;
+							// finds the nearby bars
+							let service = new google.maps.places.PlacesService(map);
+							service.nearbySearch({
+								location: { lat: favouriteAreasArray[closestLocation].lat(), lng: favouriteAreasArray[closestLocation].lng() },
+								radius: 500,
+								type: [ 'bar' ]
+							}, callback);
+		
+							// displays the nearby bars in the panel and also creates the markers
+							function callback(results, status) {
+									const displayBars = document.getElementById("display-bars");
+									displayBars.innerHTML = `<p id="header" style="color: #C36220; font-size: 1.2em">CLOSEST FAVOURITE AREA 🍺🍔🍕</p>
+															<p id="header">NEARBY BARS:</p>
+															<br>`;
+									console.log('nearby bars: ', results);
+									for (var i = 0; i < results.length; i++) {
+										createMarker(results[i]);
+										displayBarInfo(results[i], displayBars);
+									}
+							}
+	
+							// creates markers for the nearby bars
+							function createMarker(place) {
+								var marker = new google.maps.Marker({
+									map : map,
+									position : place.geometry.location,
+									title : place.name,
+									icon: {                             
+										url: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bar-71.png",
+										scaledSize: new google.maps.Size(25, 25)
+									}
+								});
+							}
+	
+							// displays the nearby bars in the panel
+							function displayBarInfo(bar, displayBars) {
+								// sometimes there's no rating for a place so the rating was displayed as "undefined". The code below shows an empty string instead
+								let rating;
+								if (bar.rating)
+									rating = bar.rating;
+								else
+									rating = '';
+							  displayBars.innerHTML += `
+									<div id="bar">
+									<a id="bar-link" href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${bar.place_id}" target="_blank">${bar.name}</a> | Rating: ${rating}</p>
+									</div>`;
+							}
 	
 							// // updates the menu so that you can calculate your route to the closest favourite area:
 							let menuEnd =  document.getElementById('end');
@@ -481,11 +530,8 @@ function initMap() {
 						// listener for the 'Christmas Party' button
 						document.getElementById("btn-christmas").addEventListener("click", christmasParty, {once : true});
 
-						// listener for the 'Favourite Areas' button
+						// listener for the 'Choose Favourite Areas' button
 						document.getElementById("btn-favourite").addEventListener("click", favouriteAreas, {once : true});
-						
-						// listener for the 'Closest Favourite Areas' button
-						document.getElementById("btn-closest-favourite").addEventListener("click", closestFavouriteArea);
 			  		})
 		  	}
 	  	})	
